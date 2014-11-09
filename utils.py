@@ -6,7 +6,7 @@ def len(obj):
   try:
     return obj.__len__()
   except AttributeError:
-    return reduce(lambda length, _: length + 1, iter(obj))
+    return reduce(lambda length, _: length + 1, iter(obj), 0)
 
 
 def display(grid):
