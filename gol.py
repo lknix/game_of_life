@@ -24,22 +24,21 @@ class Grid(object):
       yield cell
 
   def _count_neighbors(self, cell):
-    return len(ifilter(lambda c: c in self.live_cells,
-                       self._get_neighboring_cells(cell)))
+    return len(ifilter(lambda c: c in self, self._get_neighboring_cells(cell)))
 
   def _get_neighboring_cells(self, cell):
     return frozenset(imap(lambda n: self.Cell(cell.x + n.x, cell.y + n.y), self.neighbors_coords))
 
   def _get_survivors(self):
     return frozenset(ifilter(lambda c: EXTINCTION_THRESHOLD < self._count_neighbors(c) <
-                             OVERPOPULATION_THRESHOLD, self.live_cells))
+                             OVERPOPULATION_THRESHOLD, self))
 
   def _get_newborns(self):
     return frozenset(imap(lambda (key, cells): key,
                           ifilter(lambda (key, cells): len(cells) == REPRODUCTION_CONDITION,
                                   groupby(sorted(chain(*imap(
                                                         lambda c: self._get_neighboring_cells(c),
-                                                        self.live_cells)))))))
+                                                        self)))))))
 
   def next_generation(self):
     return Grid(self._get_survivors().union(self._get_newborns()))
