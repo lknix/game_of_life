@@ -28,7 +28,7 @@ class Grid(object):
                             self._get_neighboring_cells(cell))))
 
   def _get_neighboring_cells(self, cell):
-    return imap(lambda n: self.Cell(cell.x + n.x, cell.y + n.y), self.neighbors_coords)
+    return frozenset(imap(lambda n: self.Cell(cell.x + n.x, cell.y + n.y), self.neighbors_coords))
 
   def _get_survivors(self):
     return frozenset(ifilter(lambda c: EXTINCTION_THRESHOLD < self._count_neighbors(c) <
