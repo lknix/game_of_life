@@ -2,6 +2,13 @@
 import os
 
 
+def len(obj):
+  try:
+    return obj.__len__()
+  except AttributeError:
+    return reduce(lambda length, _: length + 1, iter(obj))
+
+
 def display(grid):
   def _print_horizontal_line(h_range):
     length = len(h_range) + 2
@@ -28,4 +35,3 @@ def display(grid):
     _print_row(row)
 
   _print_horizontal_line(horizontal_range)
-
