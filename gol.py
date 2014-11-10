@@ -43,22 +43,20 @@ class Grid(object):
     return Grid(self._get_survivors().union(self._get_newborns()))
 
 
-def run():
-  @tail_call
-  def _run(grid):
-    if grid.live_cells:
-      display(grid)
-      time.sleep(0.5)
-      return _run(grid.next_generation())
 
+@tail_call
+def run(grid):
+  if grid.live_cells:
+    display(grid)
+    time.sleep(0.5)
+    return run(grid.next_generation())
+
+
+if __name__ == "__main__":
   block = [(1, 1), (1, 2), (2, 1), (2, 2)]
   blinker = [(-1, 1), (-1, 2), (-1, 3)]
   glider = [(5, 4), (6, 4), (7, 4), (7, 5), (6, 6)]
   conf = block + glider + blinker
 
-  _run(Grid(conf))
+  run(Grid(conf))
   print "GAME OVER!"
-
-
-if __name__ == "__main__":
-  run()
