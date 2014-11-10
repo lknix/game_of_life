@@ -1,7 +1,7 @@
 from collections import namedtuple
 import time
 from itertools import imap, ifilter, groupby, chain
-from utils import display, len
+from utils import display, len, tail_call
 
 
 EXTINCTION_THRESHOLD = 1
@@ -44,12 +44,12 @@ class Grid(object):
 
 
 def run():
+  @tail_call
   def _run(grid):
     if grid.live_cells:
       display(grid)
       time.sleep(0.5)
-      _run(grid.next_generation())
-    print "GAME OVER!"
+      return _run(grid.next_generation())
 
   block = [(1, 1), (1, 2), (2, 1), (2, 2)]
   blinker = [(-1, 1), (-1, 2), (-1, 3)]
@@ -57,6 +57,7 @@ def run():
   conf = block + glider + blinker
 
   _run(Grid(conf))
+  print "GAME OVER!"
 
 
 if __name__ == "__main__":

@@ -1,5 +1,18 @@
 # -*- encoding: utf-8 -*-
 import os
+from functools import partial, wraps
+
+
+def tail_call(f):
+  @wraps(f)
+  def _wrapper(*args, **kwargs):
+    f_ref = f.func_globals[f.func_name]
+    f.func_globals[f.func_name] = partial(partial, f)
+    f_call = partial(f, *args, **kwargs)
+    while isinstance(f_call, partial):
+      f_call = f_call()
+    f.func_globals[f.func_name] = f_ref
+  return _wrapper
 
 
 def len(obj):
