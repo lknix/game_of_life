@@ -25,7 +25,7 @@ def len(obj):
 def display(grid):
   def _print_horizontal_line(h_range):
     length = len(h_range) + 2
-    print "━" * length
+    print u"━" * length
 
   def _print_row(row):
     print u"┃%s┃" % row
