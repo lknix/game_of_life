@@ -1,7 +1,7 @@
 from collections import namedtuple
 import time
-from itertools import imap, ifilter, groupby, chain
-from utils import display, len, tailrec
+from itertools import imap, ifilter, groupby, chain, izip
+from utils import display, len as count, tailrec
 
 
 EXTINCTION_THRESHOLD = 1
@@ -12,9 +12,9 @@ REPRODUCTION_CONDITION = 3
 class Grid(object):
 
   Cell = namedtuple("Cell", "x y")
-  neighbors_coords = (Cell(-1, 1), Cell(0, 1), Cell(1, 1),
-                      Cell(-1, 0), Cell(1, 0),
-                      Cell(-1, -1), Cell(0, -1), Cell(1, -1))
+  delta_coords = (Cell(-1, 1), Cell(0, 1), Cell(1, 1),
+                  Cell(-1, 0), Cell(0, 0), Cell(1, 0),
+                  Cell(-1, -1), Cell(0, -1), Cell(1, -1))
 
   def __init__(self, conf):
     self.live_cells = frozenset(imap(lambda c: self.Cell(*c), conf))
@@ -22,26 +22,28 @@ class Grid(object):
   def __iter__(self):
     return iter(self.live_cells)
 
-  def _count_neighbors(self, cell):
-    return len(ifilter(lambda c: c in self.live_cells, self._get_neighboring_cells(cell)))
+  def _get_live_and_neighboring_cells(self, cell):
+    return imap(lambda n: self.Cell(cell.x + n.x, cell.y + n.y), self.delta_coords)
 
-  def _get_neighboring_cells(self, cell):
-    return frozenset(imap(lambda n: self.Cell(cell.x + n.x, cell.y + n.y), self.neighbors_coords))
+  def _is_newborn(self, cell, neighbors):
+    return cell not in self.live_cells and count(neighbors) == REPRODUCTION_CONDITION
 
-  def _get_survivors(self):
-    return frozenset(ifilter(lambda c: EXTINCTION_THRESHOLD < self._count_neighbors(c) <
-                             OVERPOPULATION_THRESHOLD, self))
+  def _is_survivor(self, cell, neighbors_and_me):
+    return (cell in self.live_cells and
+            EXTINCTION_THRESHOLD < count(neighbors_and_me) - 1 < OVERPOPULATION_THRESHOLD)
 
-  def _get_newborns(self):
-    return frozenset(imap(lambda (key, cells): key,
-                          ifilter(lambda (key, cells): len(cells) == REPRODUCTION_CONDITION,
-                                  groupby(sorted(chain(*imap(
-                                                        lambda c: self._get_neighboring_cells(c),
-                                                        self)))))))
+  def _get_next_generation_cells(self):
+    def _groupby_cell_coords(cells):
+      return groupby(sorted(chain(*cells)))
+
+    return next(izip(*ifilter(lambda cell_state: (self._is_newborn(*cell_state) or
+                                                  self._is_survivor(*cell_state)),
+                              _groupby_cell_coords(
+                                imap(lambda c: self._get_live_and_neighboring_cells(c), self)))),
+                iter([]))
 
   def next_generation(self):
-    return Grid(self._get_survivors().union(self._get_newborns()))
-
+    return Grid(self._get_next_generation_cells())
 
 
 @tailrec
