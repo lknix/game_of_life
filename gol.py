@@ -20,8 +20,7 @@ class Grid(object):
     self.live_cells = frozenset(imap(lambda c: self.Cell(*c), conf))
 
   def __iter__(self):
-    for cell in self.live_cells:
-      yield cell
+    return iter(self.live_cells)
 
   def _count_neighbors(self, cell):
     return len(ifilter(lambda c: c in self.live_cells, self._get_neighboring_cells(cell)))
