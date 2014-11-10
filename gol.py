@@ -1,7 +1,7 @@
 from collections import namedtuple
 import time
 from itertools import imap, ifilter, groupby, chain
-from utils import display, len, tail_call
+from utils import display, len, tailrec
 
 
 EXTINCTION_THRESHOLD = 1
@@ -44,7 +44,7 @@ class Grid(object):
 
 
 
-@tail_call
+@tailrec
 def run(grid):
   if grid.live_cells:
     display(grid)

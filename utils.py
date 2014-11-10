@@ -3,7 +3,7 @@ import os
 from functools import partial, wraps
 
 
-def tail_call(f):
+def tailrec(f):
   @wraps(f)
   def _wrapper(*args, **kwargs):
     f_ref = f.func_globals[f.func_name]
