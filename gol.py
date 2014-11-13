@@ -39,7 +39,8 @@ class Grid(object):
     return next(izip(*ifilter(lambda cell_state: (self._is_newborn(*cell_state) or
                                                   self._is_survivor(*cell_state)),
                               _groupby_cell_coords(
-                                imap(lambda c: self._get_live_and_neighboring_cells(c), self)))),
+                                imap(lambda cell: self._get_live_and_neighboring_cells(cell),
+                                     self)))),
                 iter([]))
 
   def next_generation(self):
