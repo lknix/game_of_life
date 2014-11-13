@@ -17,10 +17,13 @@ class Grid(object):
                   Cell(-1, -1), Cell(0, -1), Cell(1, -1))
 
   def __init__(self, conf):
-    self.live_cells = frozenset(imap(lambda c: self.Cell(*c), conf))
+    super(Grid, self).__setattr__("live_cells", frozenset(imap(lambda c: Grid.Cell(*c), conf)))
 
   def __iter__(self):
     return iter(self.live_cells)
+
+  def __setattr__(self, _, __):
+    raise Exception("Cannot modify immutable object!")
 
   def _get_live_and_neighboring_cells(self, cell):
     return imap(lambda n: self.Cell(cell.x + n.x, cell.y + n.y), self.delta_coords)
